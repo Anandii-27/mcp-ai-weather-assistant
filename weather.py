@@ -3,20 +3,20 @@ import requests
 import os
 from dotenv import load_dotenv
 
-# ---------------- LOAD ENV VARIABLES ----------------
+#LOAD ENV VARIABLES 
 
 load_dotenv()
 
-# ---------------- CREATE MCP SERVER ----------------
+#CREATE MCP SERVER
 
 mcp = FastMCP("Weather Server")
 
-# ---------------- API KEY ----------------
+# API KEY 
 
 API_KEY = os.getenv("OPENWEATHER_API_KEY")
 
 
-# ---------------- TEMPERATURE TOOL ----------------
+#TEMPERATURE TOOL 
 
 @mcp.tool()
 def get_temperature(city: str):
@@ -42,7 +42,7 @@ def get_temperature(city: str):
         }
 
 
-# ---------------- HUMIDITY TOOL ----------------
+# HUMIDITY TOOL
 
 @mcp.tool()
 def get_humidity(city: str):
@@ -68,7 +68,7 @@ def get_humidity(city: str):
         }
 
 
-# ---------------- WEATHER CONDITION TOOL ----------------
+#WEATHER CONDITION TOOL
 
 @mcp.tool()
 def get_weather_condition(city: str):
@@ -94,7 +94,7 @@ def get_weather_condition(city: str):
         }
 
 
-# ---------------- FORECAST TOOL ----------------
+#FORECAST TOOL
 
 @mcp.tool()
 def get_forecast(city: str):
@@ -123,7 +123,7 @@ def get_forecast(city: str):
         }
 
 
-# ---------------- RUN MCP SERVER ----------------
+#RUN MCP SERVER 
 
 if __name__ == "__main__":
     mcp.run()
