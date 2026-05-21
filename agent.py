@@ -14,7 +14,7 @@ server_params = StdioServerParameters(
 )
 
 
-#MEMORY CODE
+#MEMORY
 
 messages = [
     {
@@ -22,7 +22,16 @@ messages = [
         "content": """
 You are a JSON-only weather assistant.
 
-You must return ONLY valid JSON.
+IMPORTANT RULES:
+- Return ONLY valid JSON
+- Return a JSON ARRAY
+- Each object must contain:
+  - tool
+  - arguments
+- Use EXACT argument names
+- No markdown
+- No explanation
+- No extra text
 
 Available tools:
 
@@ -43,44 +52,82 @@ Arguments:
 - city
 
 Rules:
-- temperature -> get_temperature
-- humidity -> get_humidity
-- weather condition -> get_weather_condition
-- forecast -> get_forecast
+
+- If user asks "weather",
+  ALWAYS use BOTH:
+  1. get_temperature
+  2. get_weather_condition
+
+- If user asks humidity,
+  use get_humidity
+
+- If user asks forecast,
+  use get_forecast
+
+- Multiple questions require multiple tools
 
 Examples:
 
-{
+User:
+What's weather in Bangalore?
+
+Response:
+
+[
+  {
     "tool": "get_temperature",
     "arguments": {
-        "city": "Bangalore"
+      "city": "Bangalore"
     }
-}
-
-{
-    "tool": "get_humidity",
-    "arguments": {
-        "city": "Mumbai"
-    }
-}
-
-{
+  },
+  {
     "tool": "get_weather_condition",
     "arguments": {
-        "city": "Delhi"
+      "city": "Bangalore"
     }
-}
+  }
+]
 
-{
+Examples:
+
+[
+  {
+    "tool": "get_temperature",
+    "arguments": {
+      "city": "Bangalore"
+    }
+  }
+]
+
+[
+  {
+    "tool": "get_temperature",
+    "arguments": {
+      "city": "Mumbai"
+    }
+  },
+  {
+    "tool": "get_weather_condition",
+    "arguments": {
+      "city": "Mumbai"
+    }
+  }
+]
+
+[
+  {
+    "tool": "get_humidity",
+    "arguments": {
+      "city": "Delhi"
+    }
+  },
+  {
     "tool": "get_forecast",
     "arguments": {
-        "city": "Chennai"
+      "city": "Chennai"
     }
-}
-
-Return ONLY JSON.
-No explanation.
-No markdown.
+  }
+]
 """
     }
 ]
@@ -121,69 +168,63 @@ async def main():
         print("\nAI Output:")
         print(ai_output)
 
-        
         ai_output = ai_output.replace("```json", "")
         ai_output = ai_output.replace("```", "")
         ai_output = ai_output.strip()
 
-        
-        start = ai_output.find("{")
-        end = ai_output.rfind("}") + 1
+        start = ai_output.find("[")
+        end = ai_output.rfind("]") + 1
 
         json_text = ai_output[start:end]
 
-        
         try:
-            action = json.loads(json_text)
+            actions = json.loads(json_text)
 
         except Exception as e:
             print("\nJSON Error:")
             print(e)
             continue
 
-        
-        tool_name = action["tool"]
-
-        
-        arguments = action["arguments"]
-
-        print("\nSelected Tool:")
-        print(tool_name)
-
-        print("\nArguments:")
-        print(arguments)
-
-        
         async with stdio_client(server_params) as streams:
 
             async with ClientSession(*streams) as session:
 
-               
                 await session.initialize()
 
-                
-                result = await session.call_tool(
-                    tool_name,
-                    arguments
-                )
+                for action in actions:
 
-                print("\nTool Result:")
+                    tool_name = action["tool"]
 
-                try:
-                    tool_result = result.content[0].text
+                    arguments = action["arguments"]
 
-                    print(tool_result)
+                    print("\nSelected Tool:")
+                    print(tool_name)
 
-                    
-                    messages.append(
-                        {
-                            "role": "assistant",
-                            "content": tool_result
-                        }
+                    print("\nArguments:")
+                    print(arguments)
+
+                    result = await session.call_tool(
+                        tool_name,
+                        arguments
                     )
 
-                except Exception:
-                    print(result)
+                    print("\nTool Result:")
+
+                    try:
+                        tool_result = result.content[0].text
+
+                        print(tool_result)
+
+                        
+                        messages.append(
+                            {
+                                "role": "assistant",
+                                "content": tool_result
+                            }
+                        )
+
+                    except Exception:
+                        print(result)
 
 
 #START PROGRAM
