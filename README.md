@@ -217,3 +217,4 @@ This project helped in learning:
 - Advanced AI agents
 
 ---
+<img width="1300" height="796" alt="image" src="https://github.com/user-attachments/assets/70e12c28-9243-4ce1-8bd0-b8b7b686793c" />
