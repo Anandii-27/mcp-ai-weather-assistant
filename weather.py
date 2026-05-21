@@ -3,64 +3,56 @@ import requests
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
+# ---------------- LOAD ENV VARIABLES ----------------
+
 load_dotenv()
 
-# Create MCP server
+# ---------------- CREATE MCP SERVER ----------------
+
 mcp = FastMCP("Weather Server")
 
-# API Key
+# ---------------- API KEY ----------------
+
 API_KEY = os.getenv("OPENWEATHER_API_KEY")
 
 
-# ---------------- WEATHER TOOL ----------------
+# ---------------- TEMPERATURE TOOL ----------------
 
 @mcp.tool()
-def get_weather(city: str, info: str = "weather"):
+def get_temperature(city: str):
 
-    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
+    url = (
+        f"https://api.openweathermap.org/data/2.5/weather"
+        f"?q={city}&appid={API_KEY}&units=metric"
+    )
 
     response = requests.get(url)
     data = response.json()
 
     try:
         temperature = data["main"]["temp"]
-        condition = data["weather"][0]["description"]
 
         return {
-            "result": f"The weather in {city} is {temperature}°C with {condition}"
+            "result": f"The temperature in {city} is {temperature}°C"
         }
 
-    elif info == "wind":
+    except:
         return {
-            "city": city,
-            "wind_speed": wind_speed
+            "error": "Could not fetch temperature data."
         }
 
-    elif info == "condition":
-        return {
-            "city": city,
-            "condition": condition
-        }
 
-    else:
-        # Full weather report
-        return {
-            "city": city,
-            "temperature": temperature,
-            "condition": condition,
-            "humidity": humidity,
-            "wind_speed": wind_speed
-        }
 # ---------------- HUMIDITY TOOL ----------------
 
 @mcp.tool()
 def get_humidity(city: str):
 
-    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
+    url = (
+        f"https://api.openweathermap.org/data/2.5/weather"
+        f"?q={city}&appid={API_KEY}&units=metric"
+    )
 
     response = requests.get(url)
-
     data = response.json()
 
     try:
@@ -76,15 +68,43 @@ def get_humidity(city: str):
         }
 
 
+# ---------------- WEATHER CONDITION TOOL ----------------
+
+@mcp.tool()
+def get_weather_condition(city: str):
+
+    url = (
+        f"https://api.openweathermap.org/data/2.5/weather"
+        f"?q={city}&appid={API_KEY}&units=metric"
+    )
+
+    response = requests.get(url)
+    data = response.json()
+
+    try:
+        condition = data["weather"][0]["description"]
+
+        return {
+            "result": f"The weather in {city} is {condition}"
+        }
+
+    except:
+        return {
+            "error": "Could not fetch weather condition."
+        }
+
+
 # ---------------- FORECAST TOOL ----------------
 
 @mcp.tool()
 def get_forecast(city: str):
 
-    url = f"https://api.openweathermap.org/data/2.5/forecast?q={city}&appid={API_KEY}&units=metric"
+    url = (
+        f"https://api.openweathermap.org/data/2.5/forecast"
+        f"?q={city}&appid={API_KEY}&units=metric"
+    )
 
     response = requests.get(url)
-
     data = response.json()
 
     try:

@@ -6,113 +6,116 @@ import asyncio
 import json
 
 
-# MCP Server Configuration
+# ---------------- MCP SERVER CONFIG ----------------
+
 server_params = StdioServerParameters(
     command="python",
     args=["weather.py"]
 )
 
 
+# ---------------- MAIN FUNCTION ----------------
+
 async def main():
 
-    # User question
+    # User input
     user_question = input("Ask something: ")
 
-    # Prompt for AI
-    prompt = f"""
-You are an AI weather assistant.
-
-Available tool:
-
-1. get_weather
-   Arguments:
-   - city
-   - info
-
-info can be:
-- temperature
-- humidity
-- wind
-- condition
-- weather
-
-Rules:
-- If user asks temperature, use info="temperature"
-- If user asks humidity, use info="humidity"
-- If user asks wind, use info="wind"
-- If user asks weather, use info="weather"
-- If user asks condition, use info="condition"
-
-Return ONLY valid JSON.
-No markdown.
-No explanation.
-No extra text.
-
-Examples:
-
-User: What's temperature in Bangalore?
-
-{{
-    "tool": "get_weather",
-    "arguments": {{
-        "city": "Bangalore",
-        "info": "temperature"
-    }}
-}}
-
-User: What's humidity in Mumbai?
-
-{{
-    "tool": "get_weather",
-    "arguments": {{
-        "city": "Mumbai",
-        "info": "humidity"
-    }}
-}}
-
-User: What's weather in Delhi?
-
-{{
-    "tool": "get_weather",
-    "arguments": {{
-        "city": "Delhi",
-        "info": "weather"
-    }}
-}}
-
-User question:
-{user_question}
-"""
-
-    # Ask local LLM
+    # Ask Local LLM
     response = chat(
         model='phi3',
         messages=[
-            {
-                'role': 'user',
-                'content': prompt
-            }
-        ]
+    {
+        'role': 'system',
+        'content': """
+You are a JSON-only weather assistant.
+
+You must return ONLY valid JSON.
+
+Available tools:
+
+1. get_temperature
+Arguments:
+- city
+
+2. get_humidity
+Arguments:
+- city
+
+3. get_weather_condition
+Arguments:
+- city
+
+4. get_forecast
+Arguments:
+- city
+
+Rules:
+- temperature -> get_temperature
+- humidity -> get_humidity
+- weather condition -> get_weather_condition
+- forecast -> get_forecast
+
+Examples:
+
+{
+    "tool": "get_temperature",
+    "arguments": {
+        "city": "Bangalore"
+    }
+}
+
+{
+    "tool": "get_humidity",
+    "arguments": {
+        "city": "Mumbai"
+    }
+}
+
+{
+    "tool": "get_weather_condition",
+    "arguments": {
+        "city": "Delhi"
+    }
+}
+
+{
+    "tool": "get_forecast",
+    "arguments": {
+        "city": "Chennai"
+    }
+}
+
+Return ONLY JSON.
+No explanation.
+No markdown.
+"""
+    },
+    {
+        'role': 'user',
+        'content': user_question
+    }
+]
     )
 
-    # Raw AI output
+    # AI raw output
     ai_output = response['message']['content'].strip()
 
     print("\nAI Output:")
     print(ai_output)
 
-    # Remove markdown formatting
+    # Remove markdown if present
     ai_output = ai_output.replace("```json", "")
     ai_output = ai_output.replace("```", "")
     ai_output = ai_output.strip()
 
-    # Extract ONLY JSON part
+    # Extract JSON only
     start = ai_output.find("{")
     end = ai_output.rfind("}") + 1
 
     json_text = ai_output[start:end]
 
-    # Convert JSON string → Python dictionary
+    # Convert JSON -> Python dict
     try:
         action = json.loads(json_text)
 
@@ -138,10 +141,10 @@ User question:
 
         async with ClientSession(*streams) as session:
 
-            # Initialize session
+            # Initialize MCP session
             await session.initialize()
 
-            # Execute tool
+            # Call MCP tool
             result = await session.call_tool(
                 tool_name,
                 arguments
@@ -152,9 +155,10 @@ User question:
             try:
                 print(result.content[0].text)
 
-            except:
+            except Exception:
                 print(result)
 
 
-# Start agent
+# ---------------- START PROGRAM ----------------
+
 asyncio.run(main())
