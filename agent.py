@@ -14,20 +14,12 @@ server_params = StdioServerParameters(
 )
 
 
-# ---------------- MAIN FUNCTION ----------------
+# ---------------- MEMORY ----------------
 
-async def main():
-
-    # User input
-    user_question = input("Ask something: ")
-
-    # Ask Local LLM
-    response = chat(
-        model='phi3',
-        messages=[
+messages = [
     {
-        'role': 'system',
-        'content': """
+        "role": "system",
+        "content": """
 You are a JSON-only weather assistant.
 
 You must return ONLY valid JSON.
@@ -90,73 +82,114 @@ Return ONLY JSON.
 No explanation.
 No markdown.
 """
-    },
-    {
-        'role': 'user',
-        'content': user_question
     }
 ]
-    )
 
-    # AI raw output
-    ai_output = response['message']['content'].strip()
 
-    print("\nAI Output:")
-    print(ai_output)
+# ---------------- MAIN FUNCTION ----------------
 
-    # Remove markdown if present
-    ai_output = ai_output.replace("```json", "")
-    ai_output = ai_output.replace("```", "")
-    ai_output = ai_output.strip()
+async def main():
 
-    # Extract JSON only
-    start = ai_output.find("{")
-    end = ai_output.rfind("}") + 1
+    while True:
 
-    json_text = ai_output[start:end]
+        # User input
+        user_question = input("\nAsk something: ")
 
-    # Convert JSON -> Python dict
-    try:
-        action = json.loads(json_text)
+        # Exit condition
+        if user_question.lower() == "quit":
+            break
 
-    except Exception as e:
-        print("\nJSON Error:")
-        print(e)
-        return
+        # Store user message in memory
+        messages.append(
+            {
+                "role": "user",
+                "content": user_question
+            }
+        )
 
-    # Extract tool name
-    tool_name = action["tool"]
+        # Ask Local LLM
+        response = chat(
+            model='phi3',
+            messages=messages
+        )
 
-    # Extract arguments
-    arguments = action["arguments"]
+        # AI raw output
+        ai_output = response['message']['content'].strip()
 
-    print("\nSelected Tool:")
-    print(tool_name)
+        # Store AI response in memory
+        messages.append(
+            {
+                "role": "assistant",
+                "content": ai_output
+            }
+        )
 
-    print("\nArguments:")
-    print(arguments)
+        print("\nAI Output:")
+        print(ai_output)
 
-    # Connect to MCP server
-    async with stdio_client(server_params) as streams:
+        # Remove markdown if present
+        ai_output = ai_output.replace("```json", "")
+        ai_output = ai_output.replace("```", "")
+        ai_output = ai_output.strip()
 
-        async with ClientSession(*streams) as session:
+        # Extract JSON only
+        start = ai_output.find("{")
+        end = ai_output.rfind("}") + 1
 
-            # Initialize MCP session
-            await session.initialize()
+        json_text = ai_output[start:end]
 
-            # Call MCP tool
-            result = await session.call_tool(
-                tool_name,
-                arguments
-            )
+        # Convert JSON -> Python dict
+        try:
+            action = json.loads(json_text)
 
-            print("\nTool Result:")
+        except Exception as e:
+            print("\nJSON Error:")
+            print(e)
+            continue
 
-            try:
-                print(result.content[0].text)
+        # Extract tool name
+        tool_name = action["tool"]
 
-            except Exception:
-                print(result)
+        # Extract arguments
+        arguments = action["arguments"]
+
+        print("\nSelected Tool:")
+        print(tool_name)
+
+        print("\nArguments:")
+        print(arguments)
+
+        # Connect to MCP server
+        async with stdio_client(server_params) as streams:
+
+            async with ClientSession(*streams) as session:
+
+                # Initialize MCP session
+                await session.initialize()
+
+                # Call MCP tool
+                result = await session.call_tool(
+                    tool_name,
+                    arguments
+                )
+
+                print("\nTool Result:")
+
+                try:
+                    tool_result = result.content[0].text
+
+                    print(tool_result)
+
+                    # Store tool result in memory
+                    messages.append(
+                        {
+                            "role": "assistant",
+                            "content": tool_result
+                        }
+                    )
+
+                except Exception:
+                    print(result)
 
 
 # ---------------- START PROGRAM ----------------
