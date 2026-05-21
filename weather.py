@@ -16,28 +16,56 @@ API_KEY = os.getenv("OPENWEATHER_API_KEY")
 # ---------------- WEATHER TOOL ----------------
 
 @mcp.tool()
-def get_weather(city: str):
+def get_weather(city: str, info: str = "weather"):
 
     url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
 
     response = requests.get(url)
-
     data = response.json()
 
-    try:
-        temperature = data["main"]["temp"]
-        condition = data["weather"][0]["description"]
+    if response.status_code != 200:
+        return {"error": data.get("message", "Something went wrong")}
 
+    # Extract values
+    temperature = data["main"]["temp"]
+    humidity = data["main"]["humidity"]
+    condition = data["weather"][0]["description"]
+    wind_speed = data["wind"]["speed"]
+
+    # Return based on requested info
+    if info == "temperature":
         return {
-            "result": f"The weather in {city} is {temperature}°C with {condition}"
+            "city": city,
+            "temperature": temperature
         }
 
-    except:
+    elif info == "humidity":
         return {
-            "result": "Could not fetch weather data."
+            "city": city,
+            "humidity": humidity
         }
 
+    elif info == "wind":
+        return {
+            "city": city,
+            "wind_speed": wind_speed
+        }
 
+    elif info == "condition":
+        return {
+            "city": city,
+            "condition": condition
+        }
+
+    else:
+        # Full weather report
+        return {
+            "city": city,
+            "temperature": temperature,
+            "condition": condition,
+            "humidity": humidity,
+            "wind_speed": wind_speed
+        }
 # ---------------- HUMIDITY TOOL ----------------
 
 @mcp.tool()
@@ -53,12 +81,13 @@ def get_humidity(city: str):
         humidity = data["main"]["humidity"]
 
         return {
-            "result": f"The humidity in {city} is {humidity}%"
+            "city": city,
+            "humidity": humidity
         }
 
     except:
         return {
-            "result": "Could not fetch humidity data."
+            "error": "Could not fetch humidity data."
         }
 
 
@@ -74,20 +103,24 @@ def get_forecast(city: str):
     data = response.json()
 
     try:
-        tomorrow = data["list"][0]
+        forecast = data["list"][0]
 
-        temperature = tomorrow["main"]["temp"]
-
-        condition = tomorrow["weather"][0]["description"]
+        temperature = forecast["main"]["temp"]
+        condition = forecast["weather"][0]["description"]
 
         return {
-            "result": f"Forecast for {city}: {temperature}°C with {condition}"
+            "city": city,
+            "temperature": temperature,
+            "condition": condition.title()
         }
 
     except:
         return {
-            "result": "Could not fetch forecast data."
+            "error": "Could not fetch forecast data."
         }
-# Run MCP server
+
+
+# ---------------- RUN MCP SERVER ----------------
+
 if __name__ == "__main__":
     mcp.run()

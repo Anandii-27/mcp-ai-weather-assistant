@@ -20,63 +20,68 @@ async def main():
 
     # Prompt for AI
     prompt = f"""
-You are an AI assistant.
+You are an AI weather assistant.
 
-Available tools:
+Available tool:
 
 1. get_weather
    Arguments:
    - city
+   - info
 
-   Use for CURRENT weather.
+info can be:
+- temperature
+- humidity
+- wind
+- condition
+- weather
 
-2. get_forecast
-   Arguments:
-   - city
+Rules:
+- If user asks temperature, use info="temperature"
+- If user asks humidity, use info="humidity"
+- If user asks wind, use info="wind"
+- If user asks weather, use info="weather"
+- If user asks condition, use info="condition"
 
-   Use for TOMORROW or FUTURE weather.
+Return ONLY valid JSON.
+No markdown.
+No explanation.
+No extra text.
 
-3. get_humidity
-   Arguments:
-   - city
+Examples:
 
-   Use for humidity questions.
-
-4. calculate
-   Arguments:
-   - expression
-
-   Use for math calculations.
-
-User question:
-{user_question}
-
-IMPORTANT RULES:
-- Use ONLY ONE tool
-- Return ONLY ONE JSON object
-- Return ONLY valid JSON
-- Use EXACT argument names
-- No markdown
-- No explanation
-- No extra text
-
-Weather Example:
+User: What's temperature in Bangalore?
 
 {{
     "tool": "get_weather",
     "arguments": {{
-        "city": "Mumbai"
+        "city": "Bangalore",
+        "info": "temperature"
     }}
 }}
 
-Calculator Example:
+User: What's humidity in Mumbai?
 
 {{
-    "tool": "calculate",
+    "tool": "get_weather",
     "arguments": {{
-        "expression": "25 * 8"
+        "city": "Mumbai",
+        "info": "humidity"
     }}
 }}
+
+User: What's weather in Delhi?
+
+{{
+    "tool": "get_weather",
+    "arguments": {{
+        "city": "Delhi",
+        "info": "weather"
+    }}
+}}
+
+User question:
+{user_question}
 """
 
     # Ask local LLM
