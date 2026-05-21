@@ -1,46 +1,55 @@
-# MCP AI Weather Assistant
+# Conversational Weather AI Agent using MCP + Phi3
 
-An AI-powered weather assistant built using MCP (Model Context Protocol) and OpenWeather API.
+A conversational AI weather assistant built using MCP (Model Context Protocol), Phi3 local LLM, and OpenWeather API.
 
-## Features
-- Get live weather information
-- AI tool selection
+This project supports:
+- Tool calling
+- Conversational memory
 - MCP architecture
-- Weather API integration
+- Local LLM integration
+- Weather forecasting
+- Humidity checking
+- Weather condition retrieval
 
-## Tech Stack
+---
+
+# Features
+
+- Conversational AI agent
+- MCP Server + MCP Client architecture
+- Local Phi3 model using Ollama
+- OpenWeather API integration
+- JSON-based tool calling
+- Memory-enabled conversation
+- Tool-result memory
+- Multiple weather tools
+- Secure API key handling using `.env`
+
+---
+
+# Tech Stack
+
 - Python
 - MCP
+- Ollama
+- Phi3
 - OpenWeather API
+- Asyncio
+- Requests
+- JSON
+- dotenv
 - Git & GitHub
 
-## Installation
+---
 
-Clone repository:
-
-```bash
-git clone https://github.com/Anandii-27/mcp-ai-weather-assistant.git
-```
-
-Install dependencies:
+# Project Structure
 
 ```bash
-pip install -r requirements.txt
-```
-
-Run project:
-
-```bash
-python client.py
-```
-
-## Example Queries
-- What's the weather in Mumbai?
-- Weather in Bangalore
-- Current weather in Delhi
-
-## Future Improvements
-- 5-day forecast
-- Air quality index
-- Sunrise/Sunset timings
-- Better AI responses
+weather-ai-agent/
+│
+├── agent.py
+├── weather.py
+├── requirements.txt
+├── .gitignore
+├── .env
+└── README.md
