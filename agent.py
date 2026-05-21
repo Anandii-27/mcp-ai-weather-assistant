@@ -6,7 +6,7 @@ import asyncio
 import json
 
 
-# ---------------- MCP SERVER CONFIG ----------------
+#MCP SERVER CONFIGURATION
 
 server_params = StdioServerParameters(
     command="python",
@@ -14,7 +14,7 @@ server_params = StdioServerParameters(
 )
 
 
-# ---------------- MEMORY ----------------
+#MEMORY CODE
 
 messages = [
     {
@@ -86,20 +86,17 @@ No markdown.
 ]
 
 
-# ---------------- MAIN FUNCTION ----------------
+#MAIN FUNCTION
 
 async def main():
 
     while True:
 
-        # User input
         user_question = input("\nAsk something: ")
 
-        # Exit condition
         if user_question.lower() == "quit":
             break
 
-        # Store user message in memory
         messages.append(
             {
                 "role": "user",
@@ -107,16 +104,13 @@ async def main():
             }
         )
 
-        # Ask Local LLM
         response = chat(
             model='phi3',
             messages=messages
         )
 
-        # AI raw output
         ai_output = response['message']['content'].strip()
 
-        # Store AI response in memory
         messages.append(
             {
                 "role": "assistant",
@@ -127,18 +121,18 @@ async def main():
         print("\nAI Output:")
         print(ai_output)
 
-        # Remove markdown if present
+        
         ai_output = ai_output.replace("```json", "")
         ai_output = ai_output.replace("```", "")
         ai_output = ai_output.strip()
 
-        # Extract JSON only
+        
         start = ai_output.find("{")
         end = ai_output.rfind("}") + 1
 
         json_text = ai_output[start:end]
 
-        # Convert JSON -> Python dict
+        
         try:
             action = json.loads(json_text)
 
@@ -147,10 +141,10 @@ async def main():
             print(e)
             continue
 
-        # Extract tool name
+        
         tool_name = action["tool"]
 
-        # Extract arguments
+        
         arguments = action["arguments"]
 
         print("\nSelected Tool:")
@@ -159,15 +153,15 @@ async def main():
         print("\nArguments:")
         print(arguments)
 
-        # Connect to MCP server
+        
         async with stdio_client(server_params) as streams:
 
             async with ClientSession(*streams) as session:
 
-                # Initialize MCP session
+               
                 await session.initialize()
 
-                # Call MCP tool
+                
                 result = await session.call_tool(
                     tool_name,
                     arguments
@@ -180,7 +174,7 @@ async def main():
 
                     print(tool_result)
 
-                    # Store tool result in memory
+                    
                     messages.append(
                         {
                             "role": "assistant",
@@ -192,6 +186,6 @@ async def main():
                     print(result)
 
 
-# ---------------- START PROGRAM ----------------
+#START PROGRAM
 
 asyncio.run(main())
