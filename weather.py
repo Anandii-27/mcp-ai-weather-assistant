@@ -23,26 +23,12 @@ def get_weather(city: str, info: str = "weather"):
     response = requests.get(url)
     data = response.json()
 
-    if response.status_code != 200:
-        return {"error": data.get("message", "Something went wrong")}
+    try:
+        temperature = data["main"]["temp"]
+        condition = data["weather"][0]["description"]
 
-    # Extract values
-    temperature = data["main"]["temp"]
-    humidity = data["main"]["humidity"]
-    condition = data["weather"][0]["description"]
-    wind_speed = data["wind"]["speed"]
-
-    # Return based on requested info
-    if info == "temperature":
         return {
-            "city": city,
-            "temperature": temperature
-        }
-
-    elif info == "humidity":
-        return {
-            "city": city,
-            "humidity": humidity
+            "result": f"The weather in {city} is {temperature}°C with {condition}"
         }
 
     elif info == "wind":
@@ -81,8 +67,7 @@ def get_humidity(city: str):
         humidity = data["main"]["humidity"]
 
         return {
-            "city": city,
-            "humidity": humidity
+            "result": f"The humidity in {city} is {humidity}%"
         }
 
     except:
@@ -109,9 +94,7 @@ def get_forecast(city: str):
         condition = forecast["weather"][0]["description"]
 
         return {
-            "city": city,
-            "temperature": temperature,
-            "condition": condition.title()
+            "result": f"Forecast for {city}: {temperature}°C with {condition}"
         }
 
     except:
