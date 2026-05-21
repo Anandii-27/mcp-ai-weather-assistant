@@ -27,9 +27,18 @@ def get_weather(city: str):
     try:
         temperature = data["main"]["temp"]
         condition = data["weather"][0]["description"]
+        humidity = data["main"]["humidity"]
+        wind_speed = data["wind"]["speed"]
 
         return {
-            "result": f"The weather in {city} is {temperature}°C with {condition}"
+            "result": f"""
+Weather in {city}
+
+Temperature : {temperature}°C
+Condition   : {condition.title()}
+Humidity    : {humidity}%
+Wind Speed  : {wind_speed} m/s
+"""
         }
 
     except:
@@ -53,7 +62,11 @@ def get_humidity(city: str):
         humidity = data["main"]["humidity"]
 
         return {
-            "result": f"The humidity in {city} is {humidity}%"
+            "result": f"""
+Humidity in {city}
+
+Humidity : {humidity}%
+"""
         }
 
     except:
@@ -74,20 +87,27 @@ def get_forecast(city: str):
     data = response.json()
 
     try:
-        tomorrow = data["list"][0]
+        forecast = data["list"][0]
 
-        temperature = tomorrow["main"]["temp"]
-
-        condition = tomorrow["weather"][0]["description"]
+        temperature = forecast["main"]["temp"]
+        condition = forecast["weather"][0]["description"]
 
         return {
-            "result": f"Forecast for {city}: {temperature}°C with {condition}"
+            "result": f"""
+Forecast for {city}
+
+Temperature : {temperature}°C
+Condition   : {condition.title()}
+"""
         }
 
     except:
         return {
             "result": "Could not fetch forecast data."
         }
-# Run MCP server
+
+
+# ---------------- RUN MCP SERVER ----------------
+
 if __name__ == "__main__":
     mcp.run()
