@@ -1,15 +1,15 @@
 # Conversational Weather AI Agent using MCP + Phi3
 
-A conversational AI weather assistant built using MCP (Model Context Protocol), Phi3 local LLM, and OpenWeather API.
+A conversational AI weather assistant built using **MCP (Model Context Protocol)**, **Phi3 local LLM**, **FastAPI**, and **OpenWeather API**.
 
-This project supports:
+This project demonstrates how to build a real AI agent with:
+
 - Tool calling
 - Conversational memory
 - MCP architecture
 - Local LLM integration
-- Weather forecasting
-- Humidity checking
-- Weather condition retrieval
+- FastAPI backend APIs
+- Browser-accessible AI endpoints
 
 ---
 
@@ -24,6 +24,9 @@ This project supports:
 - Tool-result memory
 - Multiple weather tools
 - Secure API key handling using `.env`
+- FastAPI backend integration
+- REST API endpoints
+- Browser-accessible AI agent
 
 ---
 
@@ -34,6 +37,8 @@ This project supports:
 - Ollama
 - Phi3
 - OpenWeather API
+- FastAPI
+- Uvicorn
 - Asyncio
 - Requests
 - JSON
@@ -44,11 +49,12 @@ This project supports:
 
 # Project Structure
 
-```bash
+```txt
 weather-ai-agent/
 │
 ├── agent.py
 ├── weather.py
+├── main.py
 ├── requirements.txt
 ├── .gitignore
 ├── .env
@@ -60,15 +66,25 @@ weather-ai-agent/
 # Available Tools
 
 ## 1. get_temperature
+
 Returns temperature for a city.
 
+---
+
 ## 2. get_humidity
+
 Returns humidity for a city.
 
+---
+
 ## 3. get_weather_condition
+
 Returns weather condition for a city.
 
+---
+
 ## 4. get_forecast
+
 Returns forecast for a city.
 
 ---
@@ -93,10 +109,10 @@ python -m venv .venv
 Activate virtual environment:
 
 ### Windows
+
 ```bash
 .venv\Scripts\activate
 ```
-
 
 ---
 
@@ -112,7 +128,9 @@ pip install -r requirements.txt
 
 Download Ollama from:
 
+```txt
 https://ollama.com
+```
 
 ---
 
@@ -134,19 +152,25 @@ OPENWEATHER_API_KEY=your_api_key_here
 
 Get API key from:
 
+```txt
 https://openweathermap.org/api
+```
 
 ---
 
 # Run The Project
 
-Start MCP Weather Server:
+## Start MCP Weather Server
 
 ```bash
 python weather.py
 ```
 
-In another terminal run:
+---
+
+## Run AI Agent
+
+In another terminal:
 
 ```bash
 python agent.py
@@ -154,17 +178,53 @@ python agent.py
 
 ---
 
+# FastAPI Backend Server
+
+Run FastAPI server:
+
+```bash
+uvicorn main:app --reload
+```
+
+---
+
+## Open in Browser
+
+### Home Route
+
+```txt
+http://127.0.0.1:8000
+```
+
+---
+
+### Chat Endpoint Example
+
+```txt
+http://127.0.0.1:8000/chat?message=temperature in Bangalore
+```
+
+---
+
 # Example Questions
 
-```text
+```txt
 What's the temperature in Mumbai?
+```
 
+```txt
 What's the humidity in Bangalore?
+```
 
+```txt
 What's the weather condition in Delhi?
+```
 
+```txt
 What's the forecast for Chennai?
+```
 
+```txt
 What about tomorrow?
 ```
 
@@ -173,13 +233,16 @@ What about tomorrow?
 # Memory Support
 
 This AI agent supports:
+
 - Conversation memory
 - Tool-result memory
 - Context-aware follow-up questions
 
-Example:
+---
 
-```text
+# Example Conversation
+
+```txt
 User: What's temperature in Mumbai?
 AI: 32°C
 
@@ -200,22 +263,58 @@ This project helped in learning:
 - API Integration
 - Local LLM Usage
 - Backend Development
-- Git & GitHub
+- FastAPI backend development
+- AI API server creation
+- REST APIs
+- Backend architecture
 - Async Python
+- Git & GitHub
 
 ---
 
 # Future Improvements
 
 - Multi-tool reasoning
-- FastAPI integration
 - Streamlit UI
 - Voice assistant
 - Long-term memory
 - RAG integration
 - Vector databases
 - Advanced AI agents
+- Frontend integration
+- Deployment to cloud platforms
+
+---
+
+# Project Status
+
+Completed features:
+
+- MCP server
+- MCP client
+- AI agent
+- Local LLM integration
+- Tool calling
+- Conversational memory
+- FastAPI backend
+- Browser-accessible AI APIs
+- Weather API integration
+
+---
+
+# Author
+
+Built as a learning project for understanding:
+
+- AI Agents
+- MCP
+- FastAPI
+- Backend Development
+- Local LLM systems
+- Tool-based AI architecture
 
 ---
 <img width="1292" height="783" alt="image" src="https://github.com/user-attachments/assets/48681ff7-7df8-439f-a7b1-b6992f53a709" />
 <img width="1306" height="783" alt="image" src="https://github.com/user-attachments/assets/b653f1e3-717a-4bdf-a13e-99ca36cd2cd9" />
+<img width="1919" height="585" alt="image" src="https://github.com/user-attachments/assets/0456e835-fa90-43e3-bc46-b859075e81ac" />
+
